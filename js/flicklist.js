@@ -9,7 +9,7 @@ var model = {
 var api = {
 
   root: "https://api.themoviedb.org/3",
-  token: "TODO", // TODO 0 add your api key
+  token: "2359219718c9f0d9cf5548e81898fea8", // TODO 0 add your api key
 
   /**
    * Given a movie object, returns the url to its poster image
@@ -17,8 +17,9 @@ var api = {
   posterUrl: function(movie) {
     // TODO 4b
     // implement this function
-
-    return "http://images5.fanpop.com/image/photos/25100000/movie-poster-rapunzel-and-eugene-25184488-300-450.jpg" 
+    console.log(movie.poster_path);
+    
+    return "http://image.tmdb.org/t/p/w300/" + movie.poster_path; 
   }
 }
 
@@ -37,7 +38,6 @@ function discoverMovies(callback) {
     success: function(response) {
       model.browseItems = response.results;
       callback(response);
-      console.log(response);
     }
   });
 }
@@ -76,24 +76,50 @@ function render() {
 
   // insert watchlist items
   model.watchlistItems.forEach(function(movie) {
-    var title = $("<h6></h6>").text(movie.original_title);
+    var title = $("<h6></h6>")
+      .text(movie.original_title);
+      
+      var panelHeading = $("<div></div>")
+        .attr("class", "panel-heading")
+        .append(title);
 
     // TODO 1 
     // add an "I watched it" button and append it below the title
     // Clicking should remove this movie from the watchlist and re-render
-
+    var button = $('<button class="btn btn-danger"></button>')
+      .text('I watched it')
+      .click(function() {
+        // remove this movie from the model
+        var index = model.watchlistItems.indexOf(movie);
+        model.watchlistItems.splice(index, 1);
+        // re-render
+        render();
+      });
+      
+      var poster = $("<img></img>")
+      .attr("src", api.posterUrl(movie))
+      .attr("class", "img-responsive");
+      
+      var panelBody = $("<div></div>").attr("class", "panel-body")
+        .append(poster)
+        .append(button);
+      
     // TODO 2i
     // apply the classes "btn btn-danger" to the "I watched it button"
 
     // TODO 4a
     // add a poster image and append it inside the 
     // panel body above the button
+    
+    
 
     // TODO 2g
     // re-implement the li as a bootstrap panel with a heading and a body
     var itemView = $("<li></li>")
-      .append(title)
-      .attr("class", "item-watchlist");
+      .append(panelHeading)
+      .append(panelBody)
+      .attr("class", "panel panel-default")
+      
 
     $("#section-watchlist ul").append(itemView);
   });
@@ -109,7 +135,7 @@ function render() {
 
     var title = $("<h4></h4>").text(movie.original_title);
 
-    var button = $("<button></button>")
+    var button = $("<button class='btn btn-primary'></button>")
       .text("Add to Watchlist")
       .click(function() {
         model.watchlistItems.push(movie);
@@ -120,7 +146,7 @@ function render() {
     var overview = $("<p></p>").text(movie.overview);
 
     // append everything to itemView, along with an <hr/>
-    var itemView = $("<li></li>")
+    var itemView = $("<li class='list-group-item'></li>")
       .append(title)
       .append(overview)
       .append(button);
